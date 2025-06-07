@@ -10,13 +10,14 @@ makefolder(FilesLocation)
 local files = listfiles(FilesLocation)
 
 for _, v in pairs(files) do
-    LoadedIcons[v:gsub(FilesLocation .. "/", "")] = getcustomasset(readfile(v), true)
+    LoadedIcons[v:gsub(FilesLocation .. "/", "")] = readfile(v)
 end
 
 
+
 function grabber.GetIcon(name: string): (boolean, string)
-    if LoadedIcons[name .. ".svg"] then
-        return LoadedIcons[name .. ".svg"]
+    if LoadedIcons[name .. ".png"] then
+        return getcustomasset(LoadedIcons[name .. ".png"], false)
     end
 
     local RawSVG = request({
@@ -43,11 +44,12 @@ function grabber.GetIcon(name: string): (boolean, string)
 
     if not (UploadedSVG.Success) then return false, "Issue with other" end
 
-    LoadedIcons[name] = FilesLocation .. "\\" .. name .. ".png"
+    writefile(FilesLocation .. "/" .. name .. ".png", UploadedSVG.Body)
 
-    writefile(LoadedIcons[name], UploadedSVG.Body)
+    LoadedIcons[name .. ".png"] = UploadedSVG.Body
 
-    return true, getcustomasset(readfile(LoadedIcons[name]), false)
+
+    return true, getcustomasset(LoadedIcons[name], false)
 
 end
 
